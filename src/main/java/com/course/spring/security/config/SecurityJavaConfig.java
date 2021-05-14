@@ -3,6 +3,7 @@ package com.course.spring.security.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +25,19 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
                 .withUser("admin")
                 .password(encoder().encode("password"))
                 .roles("ADMIN");
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        /* I'm going to create a definition for protect endpoints more exactly
+         * now if we want to to access to /products we won't access but another endpoint like
+         * /users we will have access
+         * */
+        http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/products/**").hasRole("ADMIN")
+                .and()
+                .httpBasic();
     }
 
     @Bean
