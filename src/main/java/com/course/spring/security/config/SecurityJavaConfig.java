@@ -24,7 +24,11 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("admin")
                 .password(encoder().encode("password"))
-                .roles("ADMIN");
+                .roles("ADMIN") // now we will create a new role for give different access to our endpoints
+                .and()
+                .withUser("user")
+                .password(encoder().encode("password1"))
+                .roles("USER");
     }
 
     @Override
@@ -33,11 +37,10 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
          * now if we want to to access to /products we won't access but another endpoint like
          * /users we will have access
          * */
-        http.csrf().disable()
-                .authorizeRequests()
+        http.csrf().disable().authorizeRequests()
                 .antMatchers("/products/**").hasRole("ADMIN")
-                .and()
-                .httpBasic();
+                .antMatchers("/users/**")
+                    .authenticated().and().httpBasic();
     }
 
     @Bean
